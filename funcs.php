@@ -85,5 +85,35 @@ function logout(): bool
 
 function addMessage(): bool
 {
+    global $pdo;
 
+    $message = !empty($_POST['message']) ? trim($_POST['message']) : '';
+
+
+    if ($_SESSION['user']['name']) {
+        if (empty($message)) {
+            $_SESSION['errors'] = 'Вы не ввели сообщение';
+            return true;
+        }
+    } else {
+        $_SESSION['errors'] = 'Вы не авторизованы';
+    }
+
+    $res = $pdo->prepare("INSERT INTO messages (name, message) VALUE (?, ?)");
+    if ($res->execute([$_SESSION['user']['name'], $message])){
+        $_SESSION['success'] = 'Сообщение было добавлено';
+        return true;
+    }else {
+        $_SESSION['errors'] = 'Ошибка';
+        return false;
+    }
+}
+
+
+function getMessages(): array
+{
+    global $pdo;
+
+    $res = $pdo->query("SELECT * FROM messages ORDER BY created_at DESC ");
+    return $res->fetchAll();
 }
