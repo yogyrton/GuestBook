@@ -42,4 +42,48 @@ function registration(): bool
     }
 }
 
+/**
+ * @return bool
+ */
+function authorisation(): bool
+{
+    global $pdo;
 
+    $login = !empty($_POST['login']) ? trim($_POST['login']) : '';
+    $pass = !empty($_POST['pass']) ? trim($_POST['pass']) : '';
+
+    if (empty($login) || empty($pass)) {
+        $_SESSION['errors'] = 'Не все поля заполнены';
+        return false;
+    }
+    
+    $res = $pdo->prepare("SELECT * FROM my_db.users WHERE login = ?");
+    $res->execute([$login]);
+    $user = $res->fetch();
+
+
+    if (!$user) {
+        $_SESSION['errors'] = 'Введен неверный логин';
+        return false;
+    }
+
+    if (password_verify($pass, $user['password'])) {
+        $_SESSION['success'] = 'Вы успешно вошли';
+        $_SESSION['user']['name'] = $user['login'];
+        return true;
+    } else {
+        $_SESSION['errors'] = 'Введен неверный пароль';
+        return false;
+    }
+}
+
+function logout(): bool
+{
+    unset($_SESSION['user']);
+    return true;
+}
+
+function addMessage(): bool
+{
+
+}

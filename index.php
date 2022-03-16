@@ -17,6 +17,20 @@ if (isset($_POST['auth'])) {
     die();
 }
 
+if (isset($_GET['do']) && $_GET['do'] == 'exit') {
+    if (!empty($_SESSION['user'])) {
+        logout();
+        header('Location: index.php');
+        die();
+    }
+}
+
+if (isset($_POST['add'])) {
+    addMessage();
+    header('Location: index.php');
+    die();
+}
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -115,7 +129,8 @@ if (isset($_POST['auth'])) {
     <?php else: ?>
         <div class="row">
             <div class="col-md-6 offset-md-3">
-                <p>Добро пожаловать, User! <a href="?do=exit">Log out</a></p>
+                <p>Добро пожаловать, <?= htmlspecialchars($_SESSION['user']['name'])?>
+                    <a href="?do=exit">Log out</a></p>
             </div>
         </div>
 
